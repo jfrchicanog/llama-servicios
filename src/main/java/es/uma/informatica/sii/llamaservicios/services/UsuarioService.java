@@ -18,18 +18,10 @@ public class UsuarioService {
     @Value("${servicio.usuarios.baseurl}")
     private String baseUrl;
 
-    private Usuario usuarioAplicacion;
-    private JwtUtil jwtUtil;
 
     private RestTemplate restTemplate;
-    public UsuarioService(RestTemplate restTemplate, JwtUtil jwtUtil) {
+    public UsuarioService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        usuarioAplicacion = Usuario.builder()
-            .id(-1L)
-            .role(Usuario.Rol.ADMINISTRADOR)
-            .nombre("Servicio de llamadas")
-            .build();
-        this.jwtUtil = jwtUtil;
     }
 
     public Optional<UsuarioDTO> getUsuario(Long id, String jwtToken) {
@@ -38,10 +30,8 @@ public class UsuarioService {
             .build()
             .toUri();
 
-        String appJwtToken = jwtUtil.generateToken(usuarioAplicacion);
-
         var peticion = RequestEntity.get(uri)
-            .header("Authorization", "Bearer "+appJwtToken)
+            .header("Authorization", jwtToken)
             .build();
 
         try {
